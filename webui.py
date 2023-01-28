@@ -66,7 +66,7 @@ class WebUI (BaseComponent):
         return gr.update(visible=change)
 
     def generation(self, text, speed : float = 1, speaker_id : int = 0, using_symbols : bool = False):
-
+        os.makedirs("outputs", exist_ok=True)
         if speaker_id >= len(self.current_model.speakers):
             print(f'TTS: Index must be smaller {len(self.current_model.speakers)}.')
             return f"Index must be smaller {len(self.current_model.speakers)}", None, None

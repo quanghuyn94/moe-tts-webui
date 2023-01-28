@@ -41,7 +41,7 @@ model : SynthesizerTrn = SynthesizerTrn.from_pre_trained(f"models/{model_names[0
 def generation(request : GenerationRequest):
     '''Generation text-to-speech.
     :request Is a GenerationRequest. '''
-
+    os.makedirs("outputs", exist_ok=True)
     audio_rate , audio_narray = model.to_speak(request.text, request.speaker_id, request.speed, request.is_symbol)
     audio_narray = to_16bit_audio(audio_narray)
 
