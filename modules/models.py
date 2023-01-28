@@ -640,7 +640,7 @@ class SynthesizerTrn(nn.Module):
         text_norm = LongTensor(text_norm)
         return text_norm
 
-    def to_speak(self, text : str, speaker_id : int, speed : float = 1, is_symbol : bool = False) -> tuple[int, numpy.ndarray]:
+    def to_speak(self, text : str, speaker_id : int, speed : float = 1, is_symbol : bool = False):
         stn_tst = self.get_text(text, self.hps, is_symbol)
         
         with no_grad():
