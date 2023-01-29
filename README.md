@@ -8,10 +8,10 @@ Preview:<br>
 ![](preview.png)
 
 ## Main function:<br>
-+ Text-to-speech, of course
-- Automatically translate into Japanese
+- Text-to-speech, of course.
+- Automatically translate into Japanese.
 - CUDAAAAAAA! 
-- API server
+- API server.
 <br>
 
 ## Model structure:<br>
