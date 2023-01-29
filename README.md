@@ -40,12 +40,12 @@ python app.py --displaywave
 python app.py --api
 ```
 
-| Arguments     | \| | Info |
-|---------------| - | ----------|
-| --displaywave | \| | Display the sound wave screen in Web UI. |
-| --device | \| | Using which device? `CUDA` or `CPU`. |
-| --share | \| | To share the app with friends. |
-| --api | \| | Use only the api server. |
+| Arguments     | Info |
+|---------------| ----------|
+| --displaywave | Display the sound wave screen in Web UI. |
+| --device | Using which device? `CUDA` or `CPU`. |
+| --share | To share the app with friends. |
+| --api | Use only the api server. |
 
 ## Model structure:
 
