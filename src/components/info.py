@@ -3,7 +3,7 @@ import os
 from omegaconf import OmegaConf
 import base64
 from googletrans import Translator
-from .basecomponent import BaseComponent
+from ..basecomponent import BaseComponent
 
 def speakers_to_string(speakers : list) -> str:
     translator = Translator()
@@ -44,7 +44,7 @@ class Info(BaseComponent):
             config_path = os.path.join(path, 'config.yaml')
 
         config = OmegaConf.load(config_path)
-        speakers = config["speakers"]
+        speakers : list = config["speakers"]
         symbols = config["symbols"]
 
         if not os.path.exists(info_path):
@@ -83,10 +83,11 @@ class Info(BaseComponent):
             </div>
         """)
 
-        return html
+        return html, speakers
 
     def render(self):
-        return gr.HTML(value=self.load_info(self.path))
-    
+        info = self.load_info(self.path)
+        return gr.HTML(value=info[0]), info[1]
+
     def update(self):
-        return gr.HTML.update(value=self.load_info(self.path))
+        return gr.HTML.update(value=self.load_info(self.path)[0])

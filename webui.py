@@ -12,7 +12,7 @@ from pydub import AudioSegment
 #Import componets
 from src.components.info import Info
 from src.components.user_translate import UserTranslate
-from src.components.basecomponent import BaseComponent
+from src.basecomponent import BaseComponent
 from src.components.audiosetting import UsedAudioSetting
 
 translator = Translator()
@@ -30,7 +30,7 @@ gr.Audio.postprocess = audio_postprocess
 
 def translation(text, lang = 'ja'):
     outputs = translator.translate(text=text, dest=lang)
-    return outputs.text
+    return outputs.text, outputs.pronunciation
 
 def sort_key(x):
     if x.isnumeric():
@@ -61,68 +61,7 @@ class WebUI (BaseComponent):
             oA.remove();
         }}
         """
-
-    def enable_auto_translate(self, change):
-        return gr.update(visible=change)
-
-    def generation(self, text, speed : float = 1, speaker_id : int = 0, using_symbols : bool = False):
-        os.makedirs("outputs", exist_ok=True)
-        if speaker_id >= len(self.current_model.speakers):
-            print(f'TTS: Index must be smaller {len(self.current_model.speakers)}.')
-            return f"Index must be smaller {len(self.current_model.speakers)}", None, None
-
-        audio = self.current_model.to_speak(text, speaker_id, speed=speed, is_symbol=using_symbols)
-
-        audio_samples = to_16bit_audio(audio[1])
-
-        audio_file = AudioSegment(
-            audio_samples.tobytes(),
-            frame_rate=audio[0],
-            sample_width=2,
-            channels=1
-            )
-
-        path = audio_file.export(f"outputs/{translator.translate(self.current_model.speakers[int(speaker_id)], dest='ja').pronunciation.title()}_{text}.mp3", format="mp3")
-
-        if self.displaywave:
-            return "Sucess", (audio[0], audio_samples), gr.update(value=gr.make_waveform((audio[0], audio_samples)))
-        
-        return "Sucess", (audio[0], audio_samples), None
-
-    def load_model(self, index : int):
-        path = self.models[index]
-
-        if self.current_model is not None:
-            print(f'{bcolors.WARNING}TTS : {bcolors.ENDC}{bcolors.FAIL}Free memory.{bcolors.ENDC}')
-            self.current_model.free_mem()
-
-        print(f'TTS : Load {path}...')
-
-        self.current_model = self.load_static(path)
-
-        info = Info(path)
-
-        return info.update()
-
-    def load_static(self, path : str):
-
-        config_path = os.path.join(path, 'config.json')
-
-        if not os.path.exists(config_path):
-            config_path = os.path.join(path, 'config.yaml')
-
-        print(f'TTS : Load {path}...')
-
-        model = SynthesizerTrn.from_pre_trained(path, self.device)
-
-        self.current_model : SynthesizerTrn = model
-
-        hps = OmegaConf.load(config_path)
-
-        model.speakers = [translation(name, 'en') for sid, name in enumerate(hps.speakers) if name != "None"]
-
-        return model
-
+    
     def __init__(self, device : str = 'cuda', displaywave : bool = False) -> None:
         paths = os.listdir('models/')
 
@@ -142,6 +81,7 @@ class WebUI (BaseComponent):
 
         self.app = gr.Blocks(title="Moe TTS")
         self.load_static(self.models[0])
+        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
 
     def setup(self):
@@ -150,21 +90,25 @@ class WebUI (BaseComponent):
                         "Feel free to [open discussion](https://huggingface.co/spaces/skytnt/moe-tts/discussions/new) "
                         "if you want to add your model to this app.\n\n")
 
-            drop_box = gr.Dropdown(label="Models", choices=self.models, value=self.models[0], interactive=True, type='index')
+            models_choices = gr.Dropdown(label="Models", choices=self.models, value=self.models[0], interactive=True, type='index')
             
             info = Info(self.models[0]).render()
+            
 
             with gr.Accordion(label="Audio setting"):
                 with gr.Row(elem_id="audio_setting_row", variant="panel"):
                     with gr.Column(scale=1):
                         using_symbols = gr.Checkbox(label="Using symbols", value=False)
-                        speakers = gr.Number(label='Speaker index', interactive=True)
+                        # speakers = gr.Number(label='Speaker index', interactive=True)
+                        choices_speakers = gr.Dropdown(label='Choices speaker', choices=self.speakers, value=self.speakers[0], interactive=True, type="value")
                     with gr.Column(scale=6):
-                        speed_setting = UsedAudioSetting().render()
+                       
+                        speed_setting = UsedAudioSetting(label="Audio speed").render()
+                        
 
-            tts_translate = UserTranslate().render()
+            tts_translate, tts_translate_choices = UserTranslate(checkbox_label="Using Auto translate to", textarea_label="Translate by Google Translate API").render()
 
-            input_text = gr.TextArea(label='Text')
+            input_text = gr.TextArea(label='Text') 
 
             submit = gr.Button('Generation')
 
@@ -172,14 +116,14 @@ class WebUI (BaseComponent):
             tts_output = gr.Audio(label="Output Audio", elem_id=f"tts-audio")   
             video = gr.Video(label="Output Wave")
 
-            tts_translate.change(fn=translation, inputs=tts_translate, outputs=input_text)
+            tts_translate.change(fn=self.translate_to, inputs=[tts_translate, tts_translate_choices], outputs=input_text)
 
             download = gr.Button("Download Audio")
             download.click(None, [], [], _js=self.download_audio_js.format(audio_id=f"tts-audio"))
 
-            drop_box.change(fn=self.load_model, inputs=drop_box, outputs=info)
+            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[info[0], choices_speakers])
 
-            submit.click(fn=self.generation, inputs=[input_text, speed_setting, speakers, using_symbols], outputs=[tts_output_message, tts_output, video])
+            submit.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers, using_symbols], outputs=[tts_output_message, tts_output, video])
 
             gr.Markdown(
                 "Unofficial demo for \n\n"
@@ -189,6 +133,84 @@ class WebUI (BaseComponent):
                 "- [https://github.com/Francis-Komizu/Sovits](https://github.com/Francis-Komizu/Sovits)\n"
                 "\nMulti translation by Google Translate API.\n\n"
             )
+
+    def translate_to(self, text : str, language : str):
+
+        languages = {"English" : "en", "Japanese": "ja"}
+
+        text = translation(text, lang=languages[language])[0]
+
+        return gr.update(value=text)
+
+        
+    def enable_auto_translate(self, change):
+        return gr.update(visible=change)
+
+    def generation(self, text, speed : float = 1, speaker: str = "", using_symbols : bool = False):
+
+        speaker_id = int(self.speakers.index(speaker))
+        print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
+
+        os.makedirs("outputs", exist_ok=True)
+        if speaker_id >= len(self.current_model.speakers):
+            print(f'TTS: Index must be smaller {len(self.current_model.speakers)}.')
+            return f"Index must be smaller {len(self.current_model.speakers)}", None, None
+
+        audio = self.current_model.to_speak(text, speaker_id, speed=speed, is_symbol=using_symbols)
+
+        audio_samples = to_16bit_audio(audio[1])
+
+        audio_file = AudioSegment(
+            audio_samples.tobytes(),
+            frame_rate=audio[0],
+            sample_width=2,
+            channels=1
+            )
+
+        audio_file.export(f"outputs/{translator.translate(self.current_model.speakers[int(speaker_id)], dest='ja').pronunciation.title()}_{text}.mp3", format="mp3")
+
+        if self.displaywave:
+            return "Sucess", (audio[0], audio_samples), gr.update(value=gr.make_waveform((audio[0], audio_samples)))
+        
+        return "Sucess", (audio[0], audio_samples), None
+
+
+    def load_model(self, index : int):
+        path = self.models[index]
+
+        if self.current_model is not None:
+            print(f'{bcolors.WARNING}TTS : {bcolors.ENDC}{bcolors.FAIL}Free memory.{bcolors.ENDC}')
+            self.current_model.free_mem()
+
+        print(f'TTS : Load {path}...')
+
+        self.current_model = self.load_static(path)
+
+        info = Info(path)
+
+        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
+
+        return info.update(), gr.update(choices=self.speakers, value=self.speakers[0])
+
+    def load_static(self, path : str):
+
+        config_path = os.path.join(path, 'config.json')
+
+        if not os.path.exists(config_path):
+            config_path = os.path.join(path, 'config.yaml')
+
+        print(f'TTS : Load {path}...')
+
+        model = SynthesizerTrn.from_pre_trained(path, self.device)
+
+        self.current_model : SynthesizerTrn = model
+
+        hps = OmegaConf.load(config_path)
+
+        model.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(hps.speakers) if name != "None"]
+
+        return model
+
 
     def render(self):
         return self.app
