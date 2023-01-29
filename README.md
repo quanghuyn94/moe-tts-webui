@@ -5,7 +5,7 @@ Example: [![image](https://colab.research.google.com/assets/colab-badge.svg)](ht
 <br>
 
 Preview:<br>
-![image]("preview.png")
+![image]("https://raw.githubusercontent.com/kanjiisme/moe-tts-webui/master/preview.png")
 
 <br>
 Main function:
