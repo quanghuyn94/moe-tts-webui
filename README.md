@@ -7,28 +7,28 @@ Example: [![image](https://colab.research.google.com/assets/colab-badge.svg)](ht
 Preview:<br>
 ![](preview.png)
 
-<br>
-Main function:
-- Text-to-speech, of course.
-- Automatically translate into Japanese.
+
+## Main function:<br>
++ Text-to-speech, of course
+- Automatically translate into Japanese
 - CUDAAAAAAA! 
-- API server.
+- API server
 <br>
 
-Model structure:<br>
+## Model structure:<br>
 + models/you_model_name/
 - - model.pth
 - - config.json (.yaml)
 - - info.json (.yaml) (Options)
 - - cover.jpg (Options)
 
-Unofficial demo for:
+## Unofficial demo for:
 - [https://github.com/CjangCjengh/MoeGoe](https://github.com/CjangCjengh/MoeGoe)
 - [https://github.com/Francis-Komizu/VITS](https://github.com/Francis-Komizu/VITS)
 - [https://github.com/luoyily/MoeTTS](https://github.com/luoyily/MoeTTS)
 - [https://github.com/Francis-Komizu/Sovits](https://github.com/Francis-Komizu/Sovits) <br>
 
-Very Thank:
+# Very Thank:
 - VITS : [Francis-Komizu](https://github.com/Francis-Komizu/VITS)
 - Demo : [CjangCjengh](https://github.com/CjangCjengh/MoeGoe)
 - Demo : [luoyily](https://github.com/luoyily/MoeTTS)
