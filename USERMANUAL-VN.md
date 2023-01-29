@@ -13,7 +13,7 @@
 
 ## **Using Auto translate:**
     Đây là phần để bạn sử dụng dịch ngay tại trang web. Bật nó nếu bạn cần phiên dịch.
-- **Choices language:**: Lựa chọn ngôn ngữ cần dịch thuật. Văn bản sau khi dịch thuật sẽ ở phần `Text`.
+- **Choices language**: Lựa chọn ngôn ngữ cần dịch thuật. Văn bản sau khi dịch thuật sẽ ở phần `Text`.
 - **Translate**: Nhập văn bản cần dịch, văn bản sau khi dịch theo `Choices language` sẽ hiện ở phần `Text`.
 ## **Text:**
 - Đây là nơi bạn nhập văn bản. **`Lưu ý`**, khi nhập văn bản, bạn phải nhập văn bản đúng ngôn ngữ của `speaker`. Để thuận tiện, hãy sử dụng `Auto translate`.

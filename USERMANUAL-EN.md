@@ -13,7 +13,7 @@
 
 ## **Using Auto translate:**
     This is the section for you to use the translation directly on the website. Turn it on if you need a translation.
-- **Choices language:**: Select the language to be translated. The translated text will be in the `Text` section.
+- **Choices language**: Select the language to be translated. The translated text will be in the `Text` section.
 - **Translate**: Enter the text to be translated, the translated text according to the `Choosing a language` will be displayed in the `Text` section.
 ## **Text:**
 - This is where you enter the text. `Note`, when entering text, you must enter the text in the `speaker's` language. For convenience, use `Auto translate`.
