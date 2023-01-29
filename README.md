@@ -7,7 +7,7 @@ Example: [![image](https://colab.research.google.com/assets/colab-badge.svg)](ht
 Preview:<br>
 ![](preview.png)
 
-## Main function:<br>
+## Features:<br>
 - Text-to-speech, of course.
 - Automatically translate into Japanese.
 - CUDAAAAAAA! 
