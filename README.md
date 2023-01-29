@@ -5,7 +5,7 @@ Example: [![image](https://colab.research.google.com/assets/colab-badge.svg)](ht
 <br>
 
 Preview:<br>
-![]("preview.png")
+![](preview.png)
 
 ## Main function:<br>
 + Text-to-speech, of course
