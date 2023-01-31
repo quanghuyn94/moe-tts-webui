@@ -9,6 +9,8 @@ import gradio.processing_utils as gr_processing_utils
 import numpy as np
 from pydub import AudioSegment
 
+from src.language import Language
+
 #Import componets
 from src.components.info import Info
 from src.components.user_translate import UserTranslate
@@ -62,7 +64,7 @@ class WebUI (BaseComponent):
         }}
         """
     
-    def __init__(self, device : str = 'cuda', displaywave : bool = False) -> None:
+    def __init__(self, device : str = 'cuda', lang = "en", displaywave : bool = False) -> None:
         paths = os.listdir('models/')
 
         self.models : list[str] = []
@@ -80,45 +82,46 @@ class WebUI (BaseComponent):
             self.models.append(str(model_path))
 
         self.app = gr.Blocks(title="Moe TTS")
+        self.lang = Language(f"languages/{lang}.json")
         self.load_static(self.models[0])
         self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
 
     def setup(self):
         with self.app:
-            gr.Markdown("# Moe TTS Better WebUI\n\n"
-                        "Feel free to [open discussion](https://huggingface.co/spaces/skytnt/moe-tts/discussions/new) "
-                        "if you want to add your model to this app.\n\n")
+            gr.Markdown(f"# {self.lang('Moe TTS Better WebUI')}\n\n"
+                        f"{self.lang('Feel free to [open discussion]')}(https://huggingface.co/spaces/skytnt/moe-tts/discussions/new) "
+                        f"{self.lang('if you want to add your model to this app.')}\n\n")
 
             models_choices = gr.Dropdown(label="Models", choices=self.models, value=self.models[0], interactive=True, type='index')
             
             info = Info(self.models[0]).render()
             
 
-            with gr.Accordion(label="Audio setting"):
+            with gr.Accordion(label=self.lang("Audio setting")):
                 with gr.Row(elem_id="audio_setting_row", variant="panel"):
                     with gr.Column(scale=1):
-                        using_symbols = gr.Checkbox(label="Using symbols", value=False)
+                        using_symbols = gr.Checkbox(label=self.lang("Using symbols"), value=False)
                         # speakers = gr.Number(label='Speaker index', interactive=True)
-                        choices_speakers = gr.Dropdown(label='Choices speaker', choices=self.speakers, value=self.speakers[0], interactive=True, type="value")
+                        choices_speakers = gr.Dropdown(label=self.lang('Choices speaker'), choices=self.speakers, value=self.speakers[0], interactive=True, type="value")
                     with gr.Column(scale=6):
                        
-                        speed_setting = UsedAudioSetting(label="Audio speed").render()
+                        speed_setting = UsedAudioSetting(label=self.lang("Speed")).render()
                         
 
-            tts_translate, tts_translate_choices = UserTranslate(checkbox_label="Using Auto translate to", textarea_label="Translate by Google Translate API").render()
+            tts_translate, tts_translate_choices = UserTranslate(lang=self.lang, checkbox_label=self.lang("Using Auto translate to"), textarea_label="Translate by Google Translate API").render()
 
-            input_text = gr.TextArea(label='Text') 
+            input_text = gr.TextArea(label=self.lang('Text'))
 
-            submit = gr.Button('Generation')
+            submit = gr.Button(self.lang('Generation'))
 
             tts_output_message = gr.Textbox(label="Output Message")
-            tts_output = gr.Audio(label="Output Audio", elem_id=f"tts-audio")   
-            video = gr.Video(label="Output Wave")
+            tts_output = gr.Audio(label=self.lang("Output Audio"), elem_id=f"tts-audio")   
+            video = gr.Video(label=self.lang("Output Wave"))
 
             tts_translate.change(fn=self.translate_to, inputs=[tts_translate, tts_translate_choices], outputs=input_text)
 
-            download = gr.Button("Download Audio")
+            download = gr.Button(self.lang("Download Audio"))
             download.click(None, [], [], _js=self.download_audio_js.format(audio_id=f"tts-audio"))
 
             models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[info[0], choices_speakers])

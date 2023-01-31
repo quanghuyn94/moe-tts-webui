@@ -1,5 +1,32 @@
 # Basic user manual Web UI
     Basic user manual Web UI.
+## Used:
+
+1. Install requirements:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Set up plugins:
+
+```bash
+cd plugins
+python setup.py install
+```
+
+3. Web UI:
+
+```bash
+python app.py --displaywave
+```
+
+3. Or API Server:
+
+```bash
+python app.py --api
+```
+# Web UI
 
 ## **Models:**
 - This is where you select your models. Choose the saved `models` in the models folder.
@@ -27,3 +54,15 @@
 - Display the audio wave.
 ## **Download audio:**
 - Download the audio.
+
+# API server
+
+## **post : /loadmodel**
+- Load a TTS model.
+- - @param index (int): The index number of the model in the list, which can be viewed from "/listmodels".
+## **post : /generation**
+- Generation the text to speech
+- - @param request: A GenerationRequest.
+- <font color='red'>Importance</font> : The model needs to be loaded first. Using `/loadmodel`.
+## **get : /listmodels**
+- Get a current list models.

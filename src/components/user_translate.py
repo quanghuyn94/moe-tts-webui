@@ -2,9 +2,10 @@ import gradio as gr
 from ..basecomponent import BaseComponent
 
 class UserTranslate(BaseComponent):
-    def __init__(self, **promps) -> None:
+    def __init__(self, lang, **promps) -> None:
         super().__init__(**promps)
         self.languages = ["English", "Japanese"]
+        self.lang = lang
 
     def enable_auto_translate(self, change):
         return gr.update(visible=change), gr.update(visible=change)
@@ -16,7 +17,7 @@ class UserTranslate(BaseComponent):
     def render(self):
         enable_auto_translate_box = gr.Checkbox(label=self.promps["checkbox_label"] + " Japanese", value=False)
 
-        tts_translate_target = gr.Dropdown(label="Choices language (Defaut: Japanese)", choices=self.languages, value="Japanese", elem_id=f"tts-translate-target", visible=False, type="value")
+        tts_translate_target = gr.Dropdown(label=self.lang("Choices language (Defaut: Japanese)"), choices=self.languages, value="Japanese", elem_id=f"tts-translate-target", visible=False, type="value")
 
         tts_translate = gr.TextArea(label=self.promps["textarea_label"], elem_id=f"tts-translate-input", visible=False)
 

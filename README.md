@@ -46,6 +46,7 @@ python app.py --api
 | --device | Using which device? `CUDA` or `CPU`. |
 | --share | To share the app with friends. |
 | --api | Use only the api server. |
+| --lang | What language to use for the UI. Default is `en`. |
 
 ## Model structure:
 

@@ -1,6 +1,31 @@
 # Basic user manual Web UI
     Hướng dẫn sử dụng Web UI cơ bản.
+## Used:
 
+1. Cài đặt các module cần thiết:
+
+```bash
+pip install -r requirements.txt
+```
+
+2. Thiết đặt plugins:
+
+```bash
+cd plugins
+python setup.py install
+```
+
+3. Web UI:
+
+```bash
+python app.py --displaywave
+```
+
+3. Hoặc chạy API Server:
+
+```bash
+python app.py --api
+```
 ## **Models:**
 - Đây là nơi bạn sẽ chọn models cho mình. Hãy lựu chọn models bạn thích mà đã lưu trong `models`.
 
@@ -27,3 +52,14 @@
 - Hiện thị sóng âm.
 ## **Download audio:**
 - Tải âm thanh về.
+# API server
+
+## **post : /loadmodel**
+- Load a TTS model.
+- - @param index (int): chỉ mục của model trong danh sách, có thể lấy bằng cách `"/listmodels"`.
+## **post : /generation**
+- Chuyển văn bản thành giọng nói
+- - @param request: Là một GenerationRequest.
+- <font color='red'>Quan trọng</font> : Model cần phải được load trước. Sử dụng `"/loadmodel"`.
+## **get : /listmodels**
+- Lấy danh sách các model hiện tại.

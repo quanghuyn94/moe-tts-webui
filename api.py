@@ -9,8 +9,6 @@ from googletrans import Translator
 
 
 class GenerationRequest(BaseModel):
-    model : str
-
     text : str
     speaker_id : int
 

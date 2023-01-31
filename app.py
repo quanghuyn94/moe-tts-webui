@@ -1,5 +1,3 @@
-from webui import WebUI
-
 from argparse import ArgumentParser
 import torch
 
@@ -10,6 +8,7 @@ def argument_parse():
     parser.add_argument("--share", action="store_true", default=False, help="share gradio app")
     parser.add_argument("--api", action="store_true", default=False, help="start api server only")
     parser.add_argument("--displaywave", action="store_true", default=False, help="turn on display of sound waves")
+    parser.add_argument("--lang", default='en', type=str, help="turn on display of sound waves")
     args = parser.parse_args()
 
     return args
@@ -26,9 +25,10 @@ def main():
         print(f'Cuda : Device {torch.cuda.get_device_name(0)} CUDA VERSION : {torch.version.cuda}')
     else:
         print(f'TTS : Using {args.device}...')
-
+    
     if not args.api:
-        app = WebUI(args.device, args.displaywave)
+        from webui import WebUI
+        app = WebUI(args.device, args.lang, args.displaywave)
         app.render().launch(share=args.share)
     else:
         print("Run API server.")
