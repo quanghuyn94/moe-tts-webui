@@ -163,15 +163,6 @@ class WebUI (BaseComponent):
 
         audio_samples = to_16bit_audio(audio[1])
 
-        audio_file = AudioSegment(
-            audio_samples.tobytes(),
-            frame_rate=audio[0],
-            sample_width=2,
-            channels=1
-            )
-
-        audio_file.export(f"outputs/{translator.translate(self.current_model.speakers[int(speaker_id)], dest='ja').pronunciation.title()}_{text}.mp3", format="mp3")
-
         if self.displaywave:
             return "Sucess", (audio[0], audio_samples), gr.update(value=gr.make_waveform((audio[0], audio_samples)))
         
