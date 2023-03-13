@@ -131,7 +131,7 @@ class WebUI (BaseComponent):
 
             choices_speakers_api = gr.Number(label="choices_speakers_api", visible=False)
             submit_api = gr.Button("submit_api", visible=False)
-            submit_api.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers_api, using_symbols], outputs=[tts_output_message, tts_output, video], api_name="generation")
+            submit_api.click(fn=self.generation_main, inputs=[input_text, speed_setting, choices_speakers_api, using_symbols], outputs=[tts_output_message, tts_output, video], api_name="generation")
 
             gr.Markdown(
                 "Unofficial demo for \n\n"
@@ -159,9 +159,9 @@ class WebUI (BaseComponent):
         speaker_id = int(self.speakers.index(speaker))
         print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
 
-        return self.generation(text, speed, speaker_id, using_symbols)
+        return self.generation_main(text, speed, int(speaker_id), using_symbols)
     
-    def generation(self, text, speed : float = 1, speaker_id : int = 0, using_symbols : bool = False):
+    def generation_main(self, text, speed : float = 1, speaker_id : int = 0, using_symbols : bool = False):
 
         if speaker_id >= len(self.current_model.speakers):
             print(f'TTS: Index must be smaller {len(self.current_model.speakers)}.')
