@@ -1,3 +1,4 @@
+from fastapi import FastAPI
 import gradio as gr
 from googletrans import Translator
 import os
@@ -64,9 +65,9 @@ class WebUI (BaseComponent):
         }}
         """
     
-    def __init__(self, device : str = 'cuda', lang = "en", displaywave : bool = False) -> None:
+    def __init__(self, device : str = 'cuda', lang = "en", displaywave : bool = False, use_api : bool = False) -> None:
         paths = os.listdir('models/')
-
+        
         self.models : list[str] = []
         self.current_model : SynthesizerTrn = None
         self.device = device
@@ -86,7 +87,7 @@ class WebUI (BaseComponent):
         self.load_static(self.models[0])
         self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
-
+        
     def setup(self):
         with self.app:
             gr.Markdown(f"# {self.lang('Moe TTS Better WebUI')}\n\n"
@@ -115,7 +116,7 @@ class WebUI (BaseComponent):
 
             submit = gr.Button(self.lang('Generation'))
 
-            tts_output_message = gr.Textbox(label="Output Message")
+            tts_output_message = gr.Textbox(label="Output Rate")
             tts_output = gr.Audio(label=self.lang("Output Audio"), elem_id=f"tts-audio")   
             video = gr.Video(label=self.lang("Output Wave"))
 
@@ -124,9 +125,13 @@ class WebUI (BaseComponent):
             download = gr.Button(self.lang("Download Audio"))
             download.click(None, [], [], _js=self.download_audio_js.format(audio_id=f"tts-audio"))
 
-            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[info[0], choices_speakers])
+            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[info[0], choices_speakers], api_name="load_model")
 
             submit.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers, using_symbols], outputs=[tts_output_message, tts_output, video])
+
+            choices_speakers_api = gr.Number(label="choices_speakers_api", visible=False)
+            submit_api = gr.Button("submit_api", visible=False)
+            submit_api.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers_api, using_symbols], outputs=[tts_output_message, tts_output, video], api_name="generation")
 
             gr.Markdown(
                 "Unofficial demo for \n\n"
@@ -154,7 +159,10 @@ class WebUI (BaseComponent):
         speaker_id = int(self.speakers.index(speaker))
         print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
 
-        os.makedirs("outputs", exist_ok=True)
+        return self.generation(text, speed, speaker_id, using_symbols)
+    
+    def generation(self, text, speed : float = 1, speaker_id : int = 0, using_symbols : bool = False):
+
         if speaker_id >= len(self.current_model.speakers):
             print(f'TTS: Index must be smaller {len(self.current_model.speakers)}.')
             return f"Index must be smaller {len(self.current_model.speakers)}", None, None
@@ -164,9 +172,9 @@ class WebUI (BaseComponent):
         audio_samples = to_16bit_audio(audio[1])
 
         if self.displaywave:
-            return "Sucess", (audio[0], audio_samples), gr.update(value=gr.make_waveform((audio[0], audio_samples)))
+            return audio[0], (audio[0], audio_samples), gr.update(value=gr.make_waveform((audio[0], audio_samples)))
         
-        return "Sucess", (audio[0], audio_samples), None
+        return audio[0], (audio[0], audio_samples), None
 
 
     def load_model(self, index : int):
@@ -205,6 +213,8 @@ class WebUI (BaseComponent):
 
         return model
 
+    def get_current_model(self):
+        return self.current_model
 
     def render(self):
         return self.app

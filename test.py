@@ -1,23 +1,33 @@
-import threading
-import time
+import requests
+import pyaudio
 
-def loading_animation(flag):
-        for loop in range(1_000_000):
-            dots = ['|', '/', '-', '\\']
-            print(" Generating...", end='\r')
-            for i in range(3):
-                if flag[0]:
-                    print("Sucess full!    ")
-                    return
-                print(dots[i % len(dots)] + " Generating...", end='\r')
-                time.sleep(0.2)
-        raise "Time out!"
+response = requests.post("http://localhost:7860/run/generation", json={
+	"data": [
+		"こんにちは、どうなされました？",
+		1,
+		0,
+		False,
+	]
+}).json()
 
-complete = [False] #Animation flag.
+data = response["data"]
+audio = data[1]
+rate = int(data[0])
 
-animation_theard = threading.Thread(target=loading_animation, args=(complete,))
-animation_theard.start()
+import base64
 
-time.sleep(10)
+# Chuỗi dữ liệu audio ở dạng base64
+audio_data_base64 = audio
 
-complete[0] = True
+# Tách phần dữ liệu base64 từ chuỗi
+audio_data_base64 = audio_data_base64.split(",")[1]
+
+# Giải mã chuỗi base64 thành dữ liệu nhị phân
+audio_data = base64.decodebytes(audio_data_base64.encode())
+
+p = pyaudio.PyAudio()
+stream = p.open(format=pyaudio.paInt16, channels=1, rate=rate, output=True)
+stream.write(audio_data)
+stream.stop_stream()
+stream.close()
+p.terminate()

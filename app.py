@@ -1,12 +1,12 @@
 from argparse import ArgumentParser
 import torch
+from webui import WebUI
 
 def argument_parse():
     parser = ArgumentParser()
     # parser.add_argument('--device', type=str, default='cpu')
     parser.add_argument('--device', type=str, default='cuda') #Cuda make you fast!.
     parser.add_argument("--share", action="store_true", default=False, help="share gradio app")
-    parser.add_argument("--api", action="store_true", default=False, help="start api server only")
     parser.add_argument("--displaywave", action="store_true", default=False, help="turn on display of sound waves")
     parser.add_argument("--lang", default='en', type=str, help="turn on display of sound waves")
     args = parser.parse_args()
@@ -26,15 +26,10 @@ def main():
     else:
         print(f'TTS : Using {args.device}...')
     
-    if not args.api:
-        from webui import WebUI
-        app = WebUI(args.device, args.lang, args.displaywave)
-        app.render().launch(share=args.share)
-    else:
-        print("Run API server.")
-
-        import api
-        api.run()
+    
+    
+    webui = WebUI(args.device, args.lang, args.displaywave)
+    webui.render().launch(share=args.share)
 
     
 

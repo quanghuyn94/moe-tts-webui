@@ -34,18 +34,11 @@ python setup.py install
 python app.py --displaywave
 ```
 
-3. Or API Server:
-
-```bash
-python app.py --api
-```
-
 | Arguments     | Info |
 |---------------| ----------|
 | --displaywave | Display the sound wave screen in Web UI. |
 | --device | Using which device? `CUDA` or `CPU`. |
 | --share | To share the app with friends. |
-| --api | Use only the api server. |
 | --lang | What language to use for the UI. Default is `en`. |
 
 ## Model structure:

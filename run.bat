@@ -1,2 +1,2 @@
 @echo off
-python app.py --displaywave --lang vn
+python app.py --lang=en
