@@ -1,2 +1,0 @@
-monotonic_align
-text
