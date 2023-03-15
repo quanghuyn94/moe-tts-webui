@@ -21,14 +21,7 @@ Preview:
 pip install -r requirements.txt
 ```
 
-2. Set up plugins:
-
-```bash
-cd plugins
-python setup.py install
-```
-
-3. Web UI:
+2. Web UI:
 
 ```bash
 python app.py --displaywave
