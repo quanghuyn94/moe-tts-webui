@@ -50,8 +50,8 @@ python app.py --displaywave
 - [https://github.com/Francis-Komizu/Sovits](https://github.com/Francis-Komizu/Sovits) <br>
 
 ## Very Thank:
-
-- VITS : [Francis-Komizu](https://github.com/Francis-Komizu/VITS)
+- VITS : [jaywalnut310](https://github.com/jaywalnut310/vits)
+- VITS Model : [Francis-Komizu](https://github.com/Francis-Komizu/VITS)
 - Demo : [CjangCjengh](https://github.com/CjangCjengh/MoeGoe)
 - Demo : [luoyily](https://github.com/luoyily/MoeTTS)
 - Demo : [skytnt](https://huggingface.co/spaces/skytnt/moe-tts)
