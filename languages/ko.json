@@ -1,0 +1,16 @@
+{
+    "Moe TTS Better WebUI": "Moe TTS Better WebUI (Moe TTS 개선판 WebUI)",
+    "Feel free to [open discussion]": "이 앱에 모델을 추가하고 싶다면.자유롭게 [토론]",
+    "if you want to add your model to this app.": "을 이용해주세요.",
+    "Audio setting": "오디오 설정",
+    "Speed": "속도",
+    "Text": "텍스트",
+    "Using symbols": "기호 사용",
+    "Choices speaker": "스피커 선택",
+    "Using Auto translate to": "자동 번역 사용",
+    "Generation": "생성",
+    "Output Audio": "오디오 출력",
+    "Output Wave": "웨이브 출력",
+    "Download Audio": "오디오 다운로드",
+    "Choices language (Defaut: Japanese)" : "언어 선택 (기본값: Japanese)"
+}
