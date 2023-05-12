@@ -157,7 +157,7 @@ class WebUI (BaseComponent):
     def generation(self, text, speed : float = 1, speaker: str = "", using_symbols : bool = False):
 
         speaker_id = int(self.speakers.index(speaker))
-        print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
+        print("Using speaker: " + f"{self.current_model.speakers[speaker_id]}({translation(self.current_model.speakers[speaker_id], 'ja')[1]})")   
 
         return self.generation_main(text, speed, int(speaker_id), using_symbols)
     

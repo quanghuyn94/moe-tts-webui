@@ -6,13 +6,11 @@ from googletrans import Translator
 from ..basecomponent import BaseComponent
 
 def speakers_to_string(speakers : list) -> str:
-    translator = Translator()
     speaker_list = ""
     for i, speaker in enumerate(speakers):
 
         if speaker == "None":
             continue
-        speaker = translator.translate(speaker, dest='ja').pronunciation
 
         speaker_list = speaker_list + f"{i}. {speaker.title()}, "
 
