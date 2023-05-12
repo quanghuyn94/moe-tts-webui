@@ -1,2 +1,3 @@
 @echo off
-python app.py --lang=en
+call .\.venv\Scripts\activate
+python app.py --displaywave
