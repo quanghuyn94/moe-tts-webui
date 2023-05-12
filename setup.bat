@@ -14,10 +14,11 @@ echo 4. Don't install pytorch
 
 set /p cuda=Enter your choice: 
 
-goto cuda_%cuda%
-
-echo "Invalid choice"
-goto select_cuda
+2>NUL CALL :cuda_%cuda%
+IF ERRORLEVEL 1 (
+    echo Invalid choice
+    goto select_cuda
+)
 
 :cuda_1
 pip3 install torch torchvision torchaudio
