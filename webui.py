@@ -85,7 +85,7 @@ class WebUI (BaseComponent):
         self.app = gr.Blocks(title="Moe TTS")
         self.lang = Language(f"languages/{lang}.json")
         self.load_static(self.models[0])
-        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
+        self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
         
     def setup(self):
@@ -157,7 +157,7 @@ class WebUI (BaseComponent):
     def generation(self, text, speed : float = 1, speaker: str = "", using_symbols : bool = False):
 
         speaker_id = int(self.speakers.index(speaker))
-        print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
+        print("Using speaker: " + f"{self.current_model.speakers[speaker_id]}({translation(self.current_model.speakers[speaker_id], 'ja')[1]})")   
 
         return self.generation_main(text, speed, int(speaker_id), using_symbols)
     
@@ -190,7 +190,7 @@ class WebUI (BaseComponent):
 
         info = Info(path)
 
-        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
+        self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
 
         return info.update(), gr.update(choices=self.speakers, value=self.speakers[0])
 
@@ -209,7 +209,7 @@ class WebUI (BaseComponent):
 
         hps = OmegaConf.load(config_path)
 
-        model.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(hps.speakers) if name != "None"]
+        model.speakers = [f"{name}({translation(name, 'ja')[1]})" for sid, name in enumerate(hps.speakers) if name != "None"]
 
         return model
 

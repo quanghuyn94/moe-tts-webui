@@ -6,13 +6,11 @@ from googletrans import Translator
 from ..basecomponent import BaseComponent
 
 def speakers_to_string(speakers : list) -> str:
-    translator = Translator()
     speaker_list = ""
     for i, speaker in enumerate(speakers):
 
         if speaker == "None":
             continue
-        speaker = translator.translate(speaker, dest='ja').pronunciation
 
         speaker_list = speaker_list + f"{i}. {speaker.title()}, "
 
@@ -64,7 +62,7 @@ class Info(BaseComponent):
         cover = info["cover"]
 
         cover_path = os.path.join(path, cover) if cover else None
-        if cover is not None:
+        if cover_path is not None:
             with open(cover_path, 'rb') as image_file:
                 image_content = image_file.read()
                 base64_image = base64.b64encode(image_content).decode()
