@@ -27,3 +27,5 @@ indic_transliteration
 num_thai
 opencc
 gradio
+accelerate
+safetensors

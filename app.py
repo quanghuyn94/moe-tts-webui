@@ -5,9 +5,10 @@ from webui import WebUI
 def argument_parse():
     parser = ArgumentParser()
     # parser.add_argument('--device', type=str, default='cpu')
-    parser.add_argument('--device', type=str, default='cuda') #Cuda make you fast!.
+    parser.add_argument('--device', type=str, default='cuda') 
     parser.add_argument("--share", action="store_true", default=False, help="share gradio app")
     parser.add_argument("--displaywave", action="store_true", default=False, help="turn on display of sound waves")
+    parser.add_argument("--model_dtype", type=str, default='fp16', help="specify the dtype for the model. Receive 2 values: fp16 and fp32.")
     parser.add_argument("--lang", default='en', type=str, help="set interface language")
     args = parser.parse_args()
 

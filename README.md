@@ -21,13 +21,6 @@ pip install -r requirements.txt
 python app.py --displaywave
 ```
 
-| Arguments     | Info |
-|---------------| ----------|
-| --displaywave | Display the sound wave screen in Web UI. |
-| --device | Using which device? `CUDA` or `CPU`. |
-| --share | To share the app with friends. |
-| --lang | What language to use for the UI. Default is `en`. |
-
 ## Note:
 
 + You should install **Visual Studio** if you use Windows.

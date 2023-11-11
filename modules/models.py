@@ -17,6 +17,7 @@ from torch import no_grad, LongTensor
 import gc
 import os
 import numpy
+from safetensors.torch import load_file
 
 def torch_gc():
     if torch.cuda.is_available():
@@ -466,14 +467,21 @@ class SynthesizerTrn(nn.Module):
 
 
     @staticmethod
-    def from_pre_trained(path : str, device = 'cuda', dtype=torch.float16): 
+    def from_pre_trained(
+        path : str, 
+        device = 'cuda', 
+        use_safetensors = False,
+        dtype=torch.float16): 
         '''Load a pre-trained checkpoint'''
+        
         config_path = os.path.join(path, 'config.json')
         model_path = os.path.join(path, 'model.pth')
 
         if os.path.exists(config_path) == False:
             config_path = os.path.join(path, 'config.yaml')
 
+        if use_safetensors == True:
+            model_path = os.path.join(path, 'model.safetensors')
         hps = OmegaConf.load(config_path)
 
         model : SynthesizerTrn = SynthesizerTrn(
@@ -488,7 +496,10 @@ class SynthesizerTrn(nn.Module):
         model.device = device
         
         model.setup()
-        utils.load_checkpoint(model_path, model, None)
+        
+        utils.load_checkpoint(model_path, model, use_safetensors=use_safetensors)
+           
+        
         model.eval().to(torch.device(device), dtype=dtype)
 
         speakers = [name for sid, name in enumerate(hps.speakers) if name != "None"]
