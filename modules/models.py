@@ -11,7 +11,6 @@ import monotonic_align
 
 from torch.nn import Conv1d, ConvTranspose1d, Conv2d
 from torch.nn.utils import weight_norm, remove_weight_norm, spectral_norm
-
 from modules.commons import init_weights, get_padding
 from text import text_to_sequence, _clean_text
 from torch import no_grad, LongTensor
@@ -467,13 +466,12 @@ class SynthesizerTrn(nn.Module):
 
 
     @staticmethod
-    def from_pre_trained(path : str, device = 'cuda'): 
+    def from_pre_trained(path : str, device = 'cuda', dtype=torch.float16): 
         '''Load a pre-trained checkpoint'''
-        print(f'Load SynthesizerTrn model from pre-trained {path}.')
         config_path = os.path.join(path, 'config.json')
         model_path = os.path.join(path, 'model.pth')
 
-        if not os.path.exists(config_path):
+        if os.path.exists(config_path) == False:
             config_path = os.path.join(path, 'config.yaml')
 
         hps = OmegaConf.load(config_path)
@@ -491,18 +489,15 @@ class SynthesizerTrn(nn.Module):
         
         model.setup()
         utils.load_checkpoint(model_path, model, None)
-        model.eval().to(torch.device(device))
+        model.eval().to(torch.device(device), dtype=dtype)
 
         speakers = [name for sid, name in enumerate(hps.speakers) if name != "None"]
         
         model.speakers = speakers
 
-        print(f'Load SynthesizerTrn model {path} done.')
-
         return model
 
     def setup(self):
-        print('Setup SynthesizerTrn model')
         self.enc_p = TextEncoder(self.n_vocab,
                                 self.inter_channels,
                                 self.hidden_channels,
@@ -549,13 +544,6 @@ class SynthesizerTrn(nn.Module):
 
     #     if n_speakers > 1:
     #         self.emb_g = nn.Embedding(n_speakers, gin_channels)
-    def free_mem(self):
-        """Free the memory after model using.\n
-        WARNING
-        --------
-        This will delete all the data, you need to re-initialize if you want to continue using it."""
-
-        del self
 
     def forward(self, x, x_lengths, y, y_lengths, sid=None, emotion_embedding=None):
 
@@ -599,9 +587,6 @@ class SynthesizerTrn(nn.Module):
         return o, l_length, attn, ids_slice, x_mask, y_mask, (z, z_p, m_p, logs_p, m_q, logs_q)
 
     def infer(self, x, x_lengths, sid=None, noise_scale=1, length_scale=1, noise_scale_w=1., max_len=None, emotion_embedding=None):
-
-        
-
         x, m_p, logs_p, x_mask = self.enc_p(x, x_lengths, emotion_embedding)
         if self.n_speakers > 1:
             g = self.emb_g(sid).unsqueeze(-1)  # [b, h, 1]
@@ -649,24 +634,6 @@ class SynthesizerTrn(nn.Module):
 
     def to_speak(self, text : str, speaker_id : int, speed : float = 1, is_symbol : bool = False):
 
-        def loading_animation(flag):
-            for loop in range(1_000_000):
-                dots = ['|', '/', '-', '\\']
-                print(" Generating...", end='\r')
-                for i in range(3):
-                    if flag[0]:
-                        print("Sucess full!    ")
-                        return
-                    print(dots[i % len(dots)] + " Generating...", end='\r')
-                    time.sleep(0.2)
-            raise "Time out!"
-
-        complete = [False] #Animation flag.
-
-        animation_theard = threading.Thread(target=loading_animation, args=(complete,))
-        animation_theard.start()
-
-
         stn_tst = self.get_text(text, self.hps, is_symbol)
         
         with no_grad():
@@ -681,7 +648,5 @@ class SynthesizerTrn(nn.Module):
         torch_gc()
 
         sampling_rate : int = self.hps.data.sampling_rate
-
-        complete[0] = True
         
         return (sampling_rate, audio)

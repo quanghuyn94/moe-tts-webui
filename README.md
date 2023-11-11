@@ -1,7 +1,4 @@
 # The better web ui for MOE-TTS
-Origin code in https://huggingface.co/spaces/skytnt/moe-tts.
-
-Example: [![image](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/drive/1oNJiT_e19E3GOprrcSP00gJN_0ZSBERV?usp=sharing).
 
 Preview:
 
@@ -9,9 +6,6 @@ Preview:
 
 ## Features:
 - Text-to-speech, of course.
-- Automatically translate into Japanese.
-- CUDAAAAAAA! 
-- API server.
 
 ## Used:
 
@@ -34,6 +28,11 @@ python app.py --displaywave
 | --share | To share the app with friends. |
 | --lang | What language to use for the UI. Default is `en`. |
 
+## Note:
+
++ You should install **Visual Studio** if you use Windows.
++ The installation of pyopenjtalk may fail. If that happens, you should go to https://github.com/r9y9/pyopenjtalk to seek help.
+
 ## Model structure:
 
 + models/you_model_name/
@@ -42,13 +41,6 @@ python app.py --displaywave
 - - info.json (.yaml) (Options)
 - - cover.jpg (Options)
 
-## Unofficial demo for:
-
-- [https://github.com/CjangCjengh/MoeGoe](https://github.com/CjangCjengh/MoeGoe)
-- [https://github.com/Francis-Komizu/VITS](https://github.com/Francis-Komizu/VITS)
-- [https://github.com/luoyily/MoeTTS](https://github.com/luoyily/MoeTTS)
-- [https://github.com/Francis-Komizu/Sovits](https://github.com/Francis-Komizu/Sovits) <br>
-
 ## Very Thank:
 - VITS : [jaywalnut310](https://github.com/jaywalnut310/vits)
 - VITS Model : [Francis-Komizu](https://github.com/Francis-Komizu/VITS)
@@ -56,6 +48,3 @@ python app.py --displaywave
 - Demo : [luoyily](https://github.com/luoyily/MoeTTS)
 - Demo : [skytnt](https://huggingface.co/spaces/skytnt/moe-tts)
 - You. 🫵
-
-
-Multi translation by Google Translate API.

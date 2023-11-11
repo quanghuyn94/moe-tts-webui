@@ -8,7 +8,7 @@ def argument_parse():
     parser.add_argument('--device', type=str, default='cuda') #Cuda make you fast!.
     parser.add_argument("--share", action="store_true", default=False, help="share gradio app")
     parser.add_argument("--displaywave", action="store_true", default=False, help="turn on display of sound waves")
-    parser.add_argument("--lang", default='en', type=str, help="turn on display of sound waves")
+    parser.add_argument("--lang", default='en', type=str, help="set interface language")
     args = parser.parse_args()
 
     return args

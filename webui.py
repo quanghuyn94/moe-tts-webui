@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 import gradio as gr
-from googletrans import Translator
 import os
 from extension.bcolors import bcolors
 from modules.models import SynthesizerTrn
@@ -14,26 +13,20 @@ from src.language import Language
 
 #Import componets
 from src.components.info import Info
-from src.components.user_translate import UserTranslate
 from src.basecomponent import BaseComponent
 from src.components.audiosetting import UsedAudioSetting
 
-translator = Translator()
 
-audio_postprocess_ori = gr.Audio.postprocess
+# audio_postprocess_ori = gr.Audio.postprocess
 
-def audio_postprocess(self, y):
-    data = audio_postprocess_ori(self, y)
-    if data is None:
-        return None
-    return gr_processing_utils.encode_url_or_file_to_base64(data["name"])
+# def audio_postprocess(self, y):
+#     data = audio_postprocess_ori(self, y)
+#     if data is None:
+#         return None
+#     return gr_processing_utils.encode_url_or_file_to_base64(data["name"])
 
 
-gr.Audio.postprocess = audio_postprocess
-
-def translation(text, lang = 'ja'):
-    outputs = translator.translate(text=text, dest=lang)
-    return outputs.text, outputs.pronunciation
+# gr.Audio.postprocess = audio_postprocess
 
 def sort_key(x):
     if x.isnumeric():
@@ -85,18 +78,15 @@ class WebUI (BaseComponent):
         self.app = gr.Blocks(title="Moe TTS")
         self.lang = Language(f"languages/{lang}.json")
         self.load_static(self.models[0])
-        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
+        self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
         
     def setup(self):
         with self.app:
-            gr.Markdown(f"# {self.lang('Moe TTS Better WebUI')}\n\n"
-                        f"{self.lang('Feel free to [open discussion]')}(https://huggingface.co/spaces/skytnt/moe-tts/discussions/new) "
-                        f"{self.lang('if you want to add your model to this app.')}\n\n")
 
             models_choices = gr.Dropdown(label="Models", choices=self.models, value=self.models[0], interactive=True, type='index')
             
-            info = Info(self.models[0]).render()
+            # info = Info(self.models[0]).render()
             
 
             with gr.Accordion(label=self.lang("Audio setting")):
@@ -110,7 +100,7 @@ class WebUI (BaseComponent):
                         speed_setting = UsedAudioSetting(label=self.lang("Speed")).render()
                         
 
-            tts_translate, tts_translate_choices = UserTranslate(lang=self.lang, checkbox_label=self.lang("Using Auto translate to"), textarea_label="Translate by Google Translate API").render()
+        
 
             input_text = gr.TextArea(label=self.lang('Text'))
 
@@ -120,12 +110,11 @@ class WebUI (BaseComponent):
             tts_output = gr.Audio(label=self.lang("Output Audio"), elem_id=f"tts-audio")   
             video = gr.Video(label=self.lang("Output Wave"))
 
-            tts_translate.change(fn=self.translate_to, inputs=[tts_translate, tts_translate_choices], outputs=input_text)
 
             download = gr.Button(self.lang("Download Audio"))
             download.click(None, [], [], _js=self.download_audio_js.format(audio_id=f"tts-audio"))
 
-            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[info[0], choices_speakers], api_name="load_model")
+            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[choices_speakers], api_name="load_model")
 
             submit.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers, using_symbols], outputs=[tts_output_message, tts_output, video])
 
@@ -133,22 +122,6 @@ class WebUI (BaseComponent):
             submit_api = gr.Button("submit_api", visible=False)
             submit_api.click(fn=self.generation_main, inputs=[input_text, speed_setting, choices_speakers_api, using_symbols], outputs=[tts_output_message, tts_output, video], api_name="generation")
 
-            gr.Markdown(
-                "Unofficial demo for \n\n"
-                "- [https://github.com/CjangCjengh/MoeGoe](https://github.com/CjangCjengh/MoeGoe)\n"
-                "- [https://github.com/Francis-Komizu/VITS](https://github.com/Francis-Komizu/VITS)\n"
-                "- [https://github.com/luoyily/MoeTTS](https://github.com/luoyily/MoeTTS)\n"
-                "- [https://github.com/Francis-Komizu/Sovits](https://github.com/Francis-Komizu/Sovits)\n"
-                "\nMulti translation by Google Translate API.\n\n"
-            )
-
-    def translate_to(self, text : str, language : str):
-
-        languages = {"English" : "en", "Japanese": "ja"}
-
-        text = translation(text, lang=languages[language])[0]
-
-        return gr.update(value=text)
 
         
     def enable_auto_translate(self, change):
@@ -157,7 +130,7 @@ class WebUI (BaseComponent):
     def generation(self, text, speed : float = 1, speaker: str = "", using_symbols : bool = False):
 
         speaker_id = int(self.speakers.index(speaker))
-        print("Using speaker: " + translation(self.current_model.speakers[speaker_id], lang='ja')[1])   
+        print("Using speaker: " + self.current_model.speakers[speaker_id])   
 
         return self.generation_main(text, speed, int(speaker_id), using_symbols)
     
@@ -190,7 +163,7 @@ class WebUI (BaseComponent):
 
         info = Info(path)
 
-        self.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(self.current_model.speakers) if name != "None"]
+        self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
 
         return info.update(), gr.update(choices=self.speakers, value=self.speakers[0])
 
@@ -209,7 +182,7 @@ class WebUI (BaseComponent):
 
         hps = OmegaConf.load(config_path)
 
-        model.speakers = [translation(name, 'ja')[1] for sid, name in enumerate(hps.speakers) if name != "None"]
+        model.speakers = [name for sid, name in enumerate(hps.speakers) if name != "None"]
 
         return model
 

@@ -2,21 +2,8 @@ import gradio as gr
 import os
 from omegaconf import OmegaConf
 import base64
-from googletrans import Translator
 from ..basecomponent import BaseComponent
 
-def speakers_to_string(speakers : list) -> str:
-    translator = Translator()
-    speaker_list = ""
-    for i, speaker in enumerate(speakers):
-
-        if speaker == "None":
-            continue
-        speaker = translator.translate(speaker, dest='ja').pronunciation
-
-        speaker_list = speaker_list + f"{i}. {speaker.title()}, "
-
-    return speaker_list
 
 def symbols_to_string(symbols : list) -> str:
     symbols_list =""
@@ -51,7 +38,7 @@ class Info(BaseComponent):
 
             return (f"""
                 <div style="padding-bottom: 10px;">No info
-                    <p>Speakers: {speakers_to_string(speakers)}</p>
+                    <p>Speakers: {speakers}</p>
                     <p>Symbol: {symbols_to_string(symbols)}</p>
                 </div>
             """)
@@ -78,7 +65,7 @@ class Info(BaseComponent):
                 {cover_markdown}
                 <p>Model author: {author}</p>
                 <p>Language: {lang}</p>
-                <p>Speakers: {speakers_to_string(speakers)}</p>
+                <p>Speakers: {speakers}</p>
                 <p>Symbol: {symbols_to_string(symbols)}</p>
             </div>
         """)
