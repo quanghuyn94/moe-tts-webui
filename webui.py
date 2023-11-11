@@ -116,7 +116,7 @@ class WebUI (BaseComponent):
             download = gr.Button(self.lang("Download Audio"))
             download.click(None, [], [], _js=self.download_audio_js.format(audio_id=f"tts-audio"))
 
-            models_choices.change(fn=self.load_model, inputs=models_choices, outputs=[choices_speakers], api_name="load_model")
+            models_choices.change(fn=self.load_model_interface, inputs=models_choices, outputs=[choices_speakers], api_name="load_model")
 
             submit.click(fn=self.generation, inputs=[input_text, speed_setting, choices_speakers, using_symbols], outputs=[tts_output_message, tts_output, video])
 
@@ -126,13 +126,10 @@ class WebUI (BaseComponent):
 
 
         
-    def enable_auto_translate(self, change):
-        return gr.update(visible=change)
 
     def generation(self, text, speed : float = 1, speaker: str = "", using_symbols : bool = False):
 
         speaker_id = int(self.speakers.index(speaker))
-        print("Using speaker: " + self.current_model.speakers[speaker_id])   
 
         return self.generation_main(text, speed, int(speaker_id), using_symbols)
     
@@ -161,7 +158,7 @@ class WebUI (BaseComponent):
 
         self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
 
-        return info.update(), gr.update(choices=self.speakers, value=self.speakers[0])
+        return gr.Dropdown(label=self.lang('Choices speaker'), choices=self.speakers, value=self.speakers[0], interactive=True, type="value")
 
     def load_model(self, path : str):
 
