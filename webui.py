@@ -77,7 +77,9 @@ class WebUI (BaseComponent):
 
         self.app = gr.Blocks(title="Moe TTS")
         self.lang = Language(f"languages/{lang}.json")
-        self.load_static(self.models[0])
+        
+        self.current_model = self.load_model(self.models[0])
+        
         self.speakers = [name for sid, name in enumerate(self.current_model.speakers) if name != "None"]
         self.setup()
         
@@ -150,16 +152,10 @@ class WebUI (BaseComponent):
         return audio[0], (audio[0], audio_samples), None
 
 
-    def load_model(self, index : int):
+    def load_model_interface(self, index : int):
         path = self.models[index]
 
-        if self.current_model is not None:
-            print(f'{bcolors.WARNING}TTS : {bcolors.ENDC}{bcolors.FAIL}Free memory.{bcolors.ENDC}')
-            self.current_model.free_mem()
-
-        print(f'TTS : Load {path}...')
-
-        self.current_model = self.load_static(path)
+        self.current_model = self.load_model(path)
 
         info = Info(path)
 
@@ -167,22 +163,18 @@ class WebUI (BaseComponent):
 
         return info.update(), gr.update(choices=self.speakers, value=self.speakers[0])
 
-    def load_static(self, path : str):
-
-        config_path = os.path.join(path, 'config.json')
-
-        if not os.path.exists(config_path):
-            config_path = os.path.join(path, 'config.yaml')
+    def load_model(self, path : str):
 
         print(f'TTS : Load {path}...')
+            
+        use_safetensors = False
+        
+        if os.path.exists(os.path.join(path, "model.safetensors")):
+            use_safetensors = True
 
-        model = SynthesizerTrn.from_pre_trained(path, self.device)
+        model = SynthesizerTrn.from_pre_trained(path, use_safetensors=use_safetensors, device=self.device)
 
         self.current_model : SynthesizerTrn = model
-
-        hps = OmegaConf.load(config_path)
-
-        model.speakers = [name for sid, name in enumerate(hps.speakers) if name != "None"]
 
         return model
 
